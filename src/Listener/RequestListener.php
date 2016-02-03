@@ -1,12 +1,34 @@
 <?php
 namespace NewRelic\Listener;
 
+use NewRelic\ClientInterface;
+use NewRelic\ModuleOptionsInterface;
+use NewRelic\TransactionNameProvider\TransactionNameProviderInterface;
 use Zend\EventManager\EventManagerInterface as Events;
 use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Router\RouteMatch;
 
 class RequestListener extends AbstractListener
 {
+    /**
+     * @var TransactionNameProviderInterface
+     */
+    private $transactionNameProvider;
+
+    /**
+     * @param ClientInterface $client
+     * @param ModuleOptionsInterface $options
+     * @param TransactionNameProviderInterface $transactionNameProvider
+     */
+    public function __construct(
+        ClientInterface $client,
+        ModuleOptionsInterface $options,
+        TransactionNameProviderInterface $transactionNameProvider
+    ) {
+        parent::__construct($client, $options);
+
+        $this->transactionNameProvider = $transactionNameProvider;
+    }
+
     /**
      * @param  Events $events
      * @return void
@@ -27,10 +49,9 @@ class RequestListener extends AbstractListener
             $this->client->setAppName($appName, $this->options->getLicense());
         }
 
-        $matches = $e->getRouteMatch();
-        if ($matches instanceof RouteMatch) {
-            $route = $matches->getMatchedRouteName();
-            $this->client->nameTransaction($route);
+        $transactionName = $this->transactionNameProvider->getTransactionNameFromMvcEvent($e);
+        if ($transactionName) {
+            $this->client->nameTransaction($transactionName);
         }
     }
 }

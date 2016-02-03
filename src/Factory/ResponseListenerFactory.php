@@ -10,6 +10,10 @@ class ResponseListenerFactory
         $client  = $serviceLocator->get('NewRelic\Client');
         $options = $serviceLocator->get('NewRelic\ModuleOptions');
 
-        return new ResponseListener($client, $options);
+        $transactionNameProvider = $serviceLocator->get(
+            $options->getTransactionNameProvider()
+        );
+
+        return new ResponseListener($client, $options, $transactionNameProvider);
     }
 }

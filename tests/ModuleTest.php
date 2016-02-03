@@ -6,6 +6,7 @@ use NewRelic\Module;
 use NewRelic\ModuleOptions;
 use NewRelic\Listener\RequestListener;
 use NewRelic\Listener\ResponseListener;
+use NewRelic\TransactionNameProvider\TransactionNameProviderInterface;
 use Zend\EventManager\EventManager;
 use Zend\Http\Request as HttpRequest;
 use Zend\Http\Response as HttpResponse;
@@ -64,14 +65,19 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $serviceManager->setService(ModuleOptions::class, $moduleOptions);
         $serviceManager->setService(
             'NewRelic\RequestListener',
-            new RequestListener($client, $moduleOptions)
+            new RequestListener($client, $moduleOptions, $this->getTransactionNameProvider())
         );
         $serviceManager->setService(
             'NewRelic\ResponseListener',
-            new ResponseListener($client, $moduleOptions)
+            new ResponseListener($client, $moduleOptions, $this->getTransactionNameProvider())
         );
 
         $module = new Module();
         $module->onBootstrap($mvcEvent);
+    }
+
+    private function getTransactionNameProvider()
+    {
+        return $this->getMock(TransactionNameProviderInterface::class);
     }
 }

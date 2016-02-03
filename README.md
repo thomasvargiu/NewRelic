@@ -83,6 +83,32 @@ return [
 Usage
 -----
 
+### Define transaction name
+
+The module use `NewRelic\Listener\RequestListener` to specify the transaction name automatically using matched route name by default.
+
+#### Transaction name providers
+
+The transaction name is retrieved from a provider (`NewRelic\TransactionNameProvider\RouteNameProvider` by default) defined in the configuration.
+
+```php
+return [
+    'newrelic' => [
+        'transaction_name_provider' => 'NewRelic\TransactionNameProvider\RouteNameProvider',
+    ],
+];
+```
+
+The package contains some providers:
+
+- RouteNameProvider
+- HttpRequestUrlProvider
+- NullProvider
+
+#### Specify transaction name manually
+
+You can also defined the transaction name yourself by defining `NullProvider` as transaction name provider and using `nameTransaction` method of the client.
+
 ### Ignore transactions
 
 NewRelic API allows to ignore some transactions. This configuration defines some routes and controllers of transactions that will be ignored.

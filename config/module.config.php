@@ -14,6 +14,7 @@ return [
             'NewRelic\RequestListener',
             'NewRelic\ResponseListener',
         ],
+        'transaction_name_provider' => 'NewRelic\TransactionNameProvider\RouteNameProvider',
     ],
     'service_manager' => [
         'invokables' => [
